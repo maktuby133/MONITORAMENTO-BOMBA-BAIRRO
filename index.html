@@ -25,13 +25,36 @@
 @media(max-width:1050px){.head{flex-wrap:wrap;padding:12px 0}.topright{width:100%;justify-content:stretch}.header-metric{flex:1}.source-compact{margin-left:auto}}
 @media(max-width:600px){.head{gap:9px}.brand{width:100%}.topright{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:8px;width:100%}.header-metric{min-height:59px;padding:8px 9px;gap:7px;border-radius:12px}.metric-icon{font-size:18px}.metric-label{font-size:9px;letter-spacing:.06em}.metric-value{font-size:12px;gap:5px}.date-metric .metric-value{gap:3px;flex-wrap:wrap}.date-metric time{display:block}.signal-bars{gap:2px}.signal-bars i{width:4px}.source-compact{grid-column:1/-1;justify-self:end;padding:0 2px;font-size:10px}.nav{padding-top:4px}}
 @media(max-width:370px){.metric-icon{display:none}.metric-value{font-size:11px}}
+
+/* Responsive refinements vNext: preserve the complete schematic on narrow screens. */
+html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-metric{min-width:0}
+.flow-scroll{max-width:100%}.watermap{max-width:100%}
+.flow-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+.diagram-zoom{display:none;border:1px solid #47728a;background:#17374b;color:#e9f8ff;border-radius:9px;padding:7px 11px;font-size:12px;font-weight:750;min-height:36px}
+@media(min-width:901px){.overview{grid-template-columns:repeat(3,minmax(0,1fr))}.head{min-height:76px}.flowcard{padding:20px 22px 14px}.watermap{width:100%;min-width:0}.flow-bottom{display:flex}}
+@media(max-width:900px){.head{align-items:flex-start}.topright{min-width:0}.header-metric{flex:1 1 180px}.columns{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){
+ header{position:relative}.head{align-items:stretch}.brand{width:100%}.topright{grid-template-columns:repeat(2,minmax(0,1fr))}.header-metric{width:100%;min-width:0;min-height:64px}.metric-content{min-width:0}.metric-value{overflow-wrap:anywhere}
+ .source-compact{grid-column:1/-1;justify-self:start}.nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.nav .tab{font-size:12px;min-height:44px}
+ .flowcard{padding:12px 9px 11px}.flow-actions{margin-bottom:5px}.flow-tag{font-size:10px;letter-spacing:.03em;white-space:normal}.diagram-zoom{display:inline-flex;align-items:center}
+ .flow-scroll{overflow:hidden;margin:0}.watermap{display:block;width:100%;min-width:0;max-width:100%;height:auto}
+ .flowcard.zoomed .flow-scroll{overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain}
+ .flowcard.zoomed .watermap{width:720px;min-width:720px;max-width:none}
+ .flow-bottom{display:grid;grid-template-columns:1fr;gap:6px}.flow-bottom span{overflow-wrap:anywhere}
+ .overview{grid-template-columns:repeat(2,minmax(0,1fr))}.overview .mainstatus{grid-column:1/-1}
+ .overview .big{overflow-wrap:anywhere}.card{border-radius:15px}.sectiontitle{gap:6px}
+ .events{max-width:100%}.event{flex-wrap:wrap}.event time{white-space:normal}.infoitem strong{overflow-wrap:anywhere}
+ .formgrid,.techgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid .field{grid-column:1/-1}.techgrid .card{min-height:115px}
+}
+@media(max-width:390px){.wrap{padding-inline:10px}.overview{grid-template-columns:1fr}.overview .mainstatus{grid-column:auto}.overview>.card{min-height:105px}.techgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.metric-icon{display:none}}
+@media(prefers-reduced-motion:reduce){.flowcard .impeller-blades{animation:none!important}}
 </style>
 </head>
 <body>
 <header><div class="wrap"><div class="head"><div class="brand"><div class="brand-icon" aria-hidden="true">💧</div><div><strong>Água do Bairro</strong><small>Monitoramento comunitário</small></div></div><div class="topright"><div class="header-metric lora-metric" id="loraHeader" role="status" aria-live="polite"><span class="metric-icon" aria-hidden="true">📡</span><div class="metric-content"><span class="metric-label">SINAL LoRa</span><span class="metric-value"><span id="loraHeaderText">SIMULADO</span><span class="signal-bars" id="loraBars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></span></div></div><div class="header-metric date-metric"><span class="metric-icon" aria-hidden="true">◷</span><div class="metric-content"><span class="metric-label">DATA E HORA</span><span class="metric-value"><time id="headerDate">--/--/----</time><time id="headerTime">--:--:--</time></span></div></div><span class="source-compact" title="Origem dos dados"><i class="dot" id="sourceDot"></i><span id="sourceLabel">Simulação</span></span><span class="hidden" id="clock"></span></div></div><nav class="nav" aria-label="Seções do painel"><button class="tab" id="tabResidents" aria-selected="true" aria-controls="residents">🏘️ Visão dos moradores</button><button class="tab" id="tabTechnical" aria-selected="false" aria-controls="technical">⚙️ Painel técnico</button></nav></div></header>
 <main class="wrap">
-<section id="residents"><section class="section flow-first"><div class="card flowcard" id="flowCard"><div class="flow-top"><span class="flow-tag" id="flowTag">● BOMBA DESLIGADA</span></div>
-<div class="flow-scroll" aria-label="Diagrama hidráulico: deslize horizontalmente no celular para visualizar todas as casas"><svg class="watermap" viewBox="0 0 1080 370" role="img" aria-label="Ilustração animada da rede pública alimentando a bomba do bairro e as residências">
+<section id="residents"><section class="section flow-first"><div class="card flowcard" id="flowCard"><div class="flow-top"><span class="flow-tag" id="flowTag">● BOMBA DESLIGADA</span><button class="diagram-zoom" id="diagramZoom" type="button" aria-pressed="false" aria-label="Ampliar diagrama hidráulico">Ampliar desenho</button></div>
+<div class="flow-scroll" aria-label="Diagrama hidráulico completo; use Ampliar desenho no celular para ver detalhes"><svg class="watermap" viewBox="0 0 1080 370" role="img" aria-label="Ilustração animada da rede pública alimentando a bomba do bairro e as residências">
 <defs><linearGradient id="water" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#72e6ff"/><stop offset="1" stop-color="#168dce"/></linearGradient><linearGradient id="building" x1="0" x2="1"><stop stop-color="#245071"/><stop offset="1" stop-color="#122d46"/></linearGradient><linearGradient id="pumpSteel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3194cf"/><stop offset=".52" stop-color="#12558e"/><stop offset="1" stop-color="#082e55"/></linearGradient><linearGradient id="motorBlue" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3d9ed8"/><stop offset=".5" stop-color="#1769a8"/><stop offset="1" stop-color="#0a3767"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
 <g class="sky"><circle cx="932" cy="61" r="24" fill="#ffd18a" opacity=".8"/><path d="M0 305H1080" stroke="#416b72" stroke-width="2"/><path d="M0 307H1080V370H0Z" fill="#102b38"/></g>
 <!-- Entrada direta da rede pública, sem representação de estação -->
@@ -145,5 +168,17 @@ function connect(){const url=$('broker').value.trim(),topic=$('topic').value.tri
 function showTech(tech){$('residents').classList.toggle('hidden',tech);$('technical').classList.toggle('hidden',!tech);$('tabResidents').setAttribute('aria-selected',String(!tech));$('tabTechnical').setAttribute('aria-selected',String(tech));if(tech)chart();window.scrollTo({top:0,behavior:'smooth'})}
 $('tabResidents').onclick=()=>showTech(false);$('tabTechnical').onclick=()=>showTech(true);$('togglePump').onclick=()=>simChange({contator:!state.contator},'Bomba alternada');$('togglePressure').onclick=()=>simChange({pressostato:!state.pressostato},'Pressostato alternado');$('toggleLora').onclick=()=>simChange({lora:!state.lora},'Comunicação LoRa alternada');$('resetSim').onclick=simulation;$('simulateBtn').onclick=simulation;$('connectBtn').onclick=connect;$('disconnectBtn').onclick=()=>{if(state.client){state.client.end(true);state.client=null}state.mqtt=false;state.lastPacket=0;message('Desconectado manualmente.');render()};$('clearEvents').onclick=()=>{state.events=[];$('events').innerHTML='<p class="help">Nenhum evento nesta sessão.</p>'};window.addEventListener('resize',chart);setInterval(()=>{$('clock').textContent=new Date().toLocaleString('pt-BR');render()},1000);setInterval(()=>{if(state.mode==='simulation'&&state.lora)history()},15000);$('clock').textContent=new Date().toLocaleString('pt-BR');simulation();
 </script>
+<script>
+(function(){
+  const btn=document.getElementById('diagramZoom');
+  const card=document.getElementById('flowCard');
+  if(!btn||!card)return;
+  btn.addEventListener('click',()=>{
+    const expanded=card.classList.toggle('zoomed');
+    btn.textContent=expanded?'Ver desenho inteiro':'Ampliar desenho';
+    btn.setAttribute('aria-pressed',String(expanded));
+    btn.setAttribute('aria-label',expanded?'Reduzir diagrama para caber na tela':'Ampliar diagrama hidráulico');
+  });
+})();
+</script>
 </body></html>
-
