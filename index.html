@@ -405,7 +405,7 @@ document.getElementById('qrScanClose').onclick=stop;overlay.addEventListener('cl
 <p id="shareQrStatus" role="status" aria-live="polite" style="font-size:13px;overflow-wrap:anywhere"></p>
 <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="shareQrCopy" class="btn" type="button">Copiar link de convite</button><button id="shareQrClose" class="btn" type="button">Fechar</button></div>
 </section></div>
-<style>#shareQrOverlay[hidden]{display:none!important}#shareQrImage canvas,#shareQrImage img{max-width:100%;height:auto}</style>
+<style>#shareQrOverlay[hidden]{display:none!important}#shareQrImage{background:#fff;padding:22px;border-radius:14px;width:max-content;max-width:100%;margin:16px auto}#shareQrImage canvas,#shareQrImage img{display:block;max-width:100%;height:auto!important;image-rendering:pixelated}</style>
 <script>
 (function(){
  const overlay=document.getElementById('shareQrOverlay'),img=document.getElementById('shareQrImage'),status=document.getElementById('shareQrStatus');
@@ -419,7 +419,7 @@ document.getElementById('qrScanClose').onclick=stop;overlay.addEventListener('cl
   // O fragmento #emqx é lido pelo index.html e não enviado ao servidor web.
   invite=location.origin+location.pathname+location.search+'#emqx='+encodeURIComponent(JSON.stringify(cfg));
   overlay.hidden=false;img.replaceChildren();status.textContent='Gerando QR Code...';
-  try{await loadQrLibrary();new QRCode(img,{text:invite,width:230,height:230,correctLevel:QRCode.CorrectLevel.L});status.textContent='QR Code pronto. A outra pessoa deve ter internet para conectar ao EMQX.';}
+  try{await loadQrLibrary();new QRCode(img,{text:invite,width:480,height:480,correctLevel:QRCode.CorrectLevel.L});status.textContent='QR Code pronto. A outra pessoa deve ter internet para conectar ao EMQX.';}
   catch(e){status.textContent=e.message;}
  });
  document.getElementById('shareQrCopy').addEventListener('click',async()=>{if(!invite)return;try{await navigator.clipboard.writeText(invite);status.textContent='Link copiado. Compartilhe apenas com pessoas autorizadas.';}catch(e){status.textContent='Não foi possível copiar automaticamente. Abra o painel em HTTPS e tente novamente.';}});
