@@ -84,6 +84,7 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 .tech-auth-actions{display:flex;gap:9px;margin-top:16px}.tech-auth-actions button{flex:1}
 #techAuthError{color:#ff7882;min-height:20px;margin:8px 0 0}
 
+.tech-auth-overlay[hidden]{display:none !important;}
 </style>
 </head>
 <body>
@@ -126,6 +127,16 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 <section class="card section"><h2>🔌 Integração HiveMQ / MQTT</h2><p class="description">O navegador recebe telemetria por WebSocket seguro (WSS). Utilize credenciais restritas a leitura; para disponibilizar o painel publicamente, prefira um backend que publique apenas os estados necessários, sem expor credenciais MQTT aos moradores.</p><div class="formgrid" style="margin:19px 0"><div class="field span2"><label for="broker">Broker WSS</label><input id="broker" placeholder="wss://seu-cluster.s1.eu.hivemq.cloud:8884/mqtt" autocomplete="off"></div><div class="field"><label for="username">Usuário MQTT</label><input id="username" autocomplete="off"></div><div class="field"><label for="password">Senha MQTT (somente nesta sessão)</label><input id="password" type="password" autocomplete="off"></div><div class="field"><label for="topic">Tópico de telemetria</label><input id="topic" value="estacao/bomba01/telemetria"></div><div class="field"><label for="timeout">Tempo máximo sem pacote (segundos)</label><input id="timeout" type="number" min="5" max="3600" value="30"></div></div><div class="buttons"><button class="btn primary" id="connectBtn">Conectar ao HiveMQ</button><button class="btn" id="disconnectBtn">Desconectar</button></div><p class="help">JSON recebido do gateway: <code>{"online":true,"contator":true,"pressostato":true,"lora_rssi":-85}</code>. Também aceita <code>contactor</code>, <code>pressure_ok</code> e <code>lora_rssi</code>. O firmware deve normalizar os sinais para que <code>pressostato:true</code> signifique pressão suficiente. Não há publicação de comandos MQTT.</p></section></section>
 <footer class="foot">Água do Bairro · Monitoramento informativo da estação de bombeamento. Não substitui inspeção, proteções elétricas/hidráulicas nem comunicados oficiais. <span id="footerMode">Dados simulados.</span></footer></main>
 <script src="https://unpkg.com/mqtt@5.10.4/dist/mqtt.min.js" defer></script>
+<div class="tech-auth-overlay" id="techAuthOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="techAuthTitle">
+  <form class="tech-auth-box" id="techAuthForm" autocomplete="off">
+    <h2 id="techAuthTitle">🔒 Painel técnico</h2>
+    <p>Digite a senha para acessar as configurações e os testes.</p>
+    <label for="techAuthPassword">Senha de acesso</label>
+    <input id="techAuthPassword" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" required placeholder="••••" autocomplete="off">
+    <p id="techAuthError" role="alert" aria-live="polite"></p>
+    <div class="tech-auth-actions"><button type="button" class="btn" id="techAuthCancel">Cancelar</button><button type="submit" class="btn primary">Entrar</button></div>
+  </form>
+</div>
 <script>
 'use strict';
 const $=id=>document.getElementById(id),state={mode:'mqtt',contator:false,pressostato:false,lora:false,rssi:null,mqtt:false,client:null,lastPacket:0,history:[],events:[],deviceOnline:false};let lastSignature='',lastAlarm='';
@@ -184,14 +195,5 @@ $('tabTechnical').onclick=openTechAuth;$('togglePump').onclick=()=>simChange({co
 </script>
 
 
-<div class="tech-auth-overlay" id="techAuthOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="techAuthTitle">
-  <form class="tech-auth-box" id="techAuthForm" autocomplete="off">
-    <h2 id="techAuthTitle">🔒 Painel técnico</h2>
-    <p>Digite a senha para acessar as configurações e os testes.</p>
-    <label for="techAuthPassword">Senha de acesso</label>
-    <input id="techAuthPassword" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" required placeholder="••••" autocomplete="off">
-    <p id="techAuthError" role="alert" aria-live="polite"></p>
-    <div class="tech-auth-actions"><button type="button" class="btn" id="techAuthCancel">Cancelar</button><button type="submit" class="btn primary">Entrar</button></div>
-  </form>
-</div>
+
 </body></html>
