@@ -107,6 +107,13 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 @keyframes pumpAlarmHalo{0%,100%{opacity:.95;stroke-width:3}50%{opacity:.25;stroke-width:6}}
 @media(prefers-reduced-motion:reduce){#pumpAlarmBox,#pumpAlarmBox .pump-alarm-halo{animation:none!important}}
 </style>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Água do Bairro">
+<meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
 <header><div class="wrap"><div class="head"><div class="brand"><div class="brand-icon" aria-hidden="true">💧</div><div><strong>Água do Bairro</strong><small>Monitoramento comunitário</small></div></div><div class="topright"><div class="header-metric lora-metric" id="loraHeader" role="status" aria-live="polite"><span class="metric-icon" aria-hidden="true">📡</span><div class="metric-content"><span class="metric-label">SINAL LoRa</span><span class="metric-value"><span id="loraHeaderText">SIMULADO</span><span class="signal-bars" id="loraBars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></span></div></div><div class="header-metric date-metric"><span class="metric-icon" aria-hidden="true">◷</span><div class="metric-content"><span class="metric-label">DATA E HORA</span><span class="metric-value"><time id="headerDate">--/--/----</time><time id="headerTime">--:--:--</time></span></div></div><span class="source-compact" title="Origem dos dados"><i class="dot" id="sourceDot"></i><span id="sourceLabel">Simulação</span></span><span class="hidden" id="clock"></span></div></div><nav class="nav" aria-label="Seções do painel"><button class="tab" id="tabResidents" aria-selected="true" aria-controls="residents">🏘️ Visão dos moradores</button><button class="tab" id="tabTechnical" aria-selected="false" aria-controls="technical">⚙️ Painel técnico</button></nav></div></header>
@@ -276,4 +283,13 @@ $('tabTechnical').onclick=openTechAuth;$('togglePump').onclick=()=>simChange({co
 
 
 
+<script>
+// PWA: instala o painel sem alterar suas funções ou aparência.
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js', {scope:'./'})
+      .catch(function (err) { console.warn('Service worker indisponível:', err); });
+  });
+}
+</script>
 </body></html>

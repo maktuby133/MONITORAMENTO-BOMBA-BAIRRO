@@ -1,0 +1,14 @@
+ÁGUA DO BAIRRO — INSTALAÇÃO COMO APLICATIVO (PWA)
+
+1. Extraia os arquivos do ZIP.
+2. Envie TODOS os arquivos para a mesma pasta do repositório GitHub Pages:
+   index.html, manifest.webmanifest, service-worker.js, icon-180.png, icon-192.png, icon-512.png.
+3. Faça Commit changes e aguarde o GitHub Pages publicar.
+4. Android (Chrome): abra o link HTTPS, menu ⋮ > Instalar app / Adicionar à tela inicial.
+5. iPhone (Safari): abra o link HTTPS, Compartilhar > Adicionar à Tela de Início > Adicionar.
+
+O layout do dashboard foi preservado; foram adicionados apenas metadados e registro do PWA.
+O aplicativo não depende de Play Store nem App Store.
+O painel pode abrir offline, mas os dados reais do MQTT exigem internet.
+A senha 3256 do painel técnico é apenas uma barreira visual, não autenticação segura.
+Após atualizar arquivos, feche e reabra o app; pode ser necessário limpar o cache se uma versão antiga persistir.
