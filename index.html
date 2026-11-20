@@ -389,11 +389,55 @@ if ('serviceWorker' in navigator && window.isSecureContext) {
 <div id="qrScanOverlay" hidden style="position:fixed;inset:0;z-index:11000;background:#06121def;display:flex;align-items:center;justify-content:center;padding:16px"><section style="background:#10283b;border:1px solid #3d6d84;border-radius:16px;padding:20px;width:min(100%,480px);color:#fff"><h2 style="margin:0 0 8px">Ler QR Code do receptor</h2><p style="font-size:13px;color:#b6cddd">O navegador precisa de permissão de câmera e conexão HTTPS. O QR atualizado abre diretamente o painel HTTPS. É necessária conexão com a internet.</p><video id="qrScanVideo" autoplay playsinline muted style="width:100%;max-height:270px;background:#000;border-radius:10px"></video><p id="qrScanMsg" style="font-size:13px;color:#b6cddd"></p><button type="button" id="qrScanClose" style="padding:11px;margin-top:9px">Fechar</button></section></div>
 <style>#qrScanOverlay[hidden]{display:none!important}</style>
 <script>
-(function(){const overlay=document.getElementById('qrScanOverlay'),video=document.getElementById('qrScanVideo'),msg=document.getElementById('qrScanMsg');let stream=null,active=false,detector=null;
-function stop(){active=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}video.srcObject=null;overlay.hidden=true;}
-function openPair(url){try{const u=new URL(url);if(u.protocol!=='http:'&&u.protocol!=='https:')throw Error('Protocolo inválido');const direct=u.protocol==='https:'&&u.hash.startsWith('#emqx=');const legacy=u.pathname==='/pair'&&u.searchParams.has('t');if(!direct&&!legacy)throw Error('Não é um QR de pareamento válido');if(direct){const p=JSON.parse(decodeURIComponent(u.hash.slice(6)));if(p.v!==1||!p.host||!p.username||!p.password||!p.topic)throw Error('Configuração incompleta');if(u.origin!==location.origin||u.pathname!==location.pathname)throw Error('QR destinado a outro painel');stop();location.hash=u.hash;const imported=importPairingFromQr();if(imported){message('QR recebido. Iniciando conexão ao EMQX...');if(window.mqtt&&typeof window.mqtt.connect==='function')connect();else setTimeout(()=>{if(window.mqtt)connect();else message('Biblioteca MQTT indisponível. Verifique a internet e recarregue a página.');},1500);}return;}stop();location.href=u.href;}catch(e){msg.textContent='Link inválido: '+e.message;}}
-async function scan(){if(!active)return;try{const codes=await detector.detect(video);if(codes.length){openPair(codes[0].rawValue);return;}}catch(e){}if(active)setTimeout(scan,250);}
-document.getElementById('scanQrBtn')?.addEventListener('click',async()=>{overlay.hidden=false;msg.textContent='Solicitando câmera...';if(!('BarcodeDetector' in window)){msg.textContent='Este navegador não oferece leitura QR integrada. Use a câmera do celular para escanear o QR ou cole o link abaixo.';return;}try{detector=new BarcodeDetector({formats:['qr_code']});stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});video.srcObject=stream;await video.play();active=true;msg.textContent='Aponte a câmera para o QR Code do receptor.';scan();}catch(e){msg.textContent='Não foi possível abrir a câmera: '+e.message+' — use o link manual ou a câmera do celular.';}});
+(function(){
+const overlay=document.getElementById('qrScanOverlay'),video=document.getElementById('qrScanVideo'),msg=document.getElementById('qrScanMsg');
+let stream=null,active=false,detector=null,jsqr=null,scanning=false;
+const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});
+function stop(){active=false;scanning=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}video.srcObject=null;overlay.hidden=true;}
+function openPair(url){try{
+ const u=new URL(url);if(u.protocol!=='http:'&&u.protocol!=='https:')throw Error('Protocolo inválido');
+ const direct=u.protocol==='https:'&&u.hash.startsWith('#emqx=');const legacy=u.pathname==='/pair'&&u.searchParams.has('t');
+ if(!direct&&!legacy)throw Error('QR não é de pareamento');
+ if(direct){const p=JSON.parse(decodeURIComponent(u.hash.slice(6)));
+ if(p.v!==1||!p.host||!p.username||!p.password||!p.topic)throw Error('Configuração incompleta');
+ if(u.origin!==location.origin||u.pathname!==location.pathname)throw Error('QR destinado a outro painel');
+ stop();location.hash=u.hash;const imported=importPairingFromQr();
+ if(imported){message('QR recebido. Iniciando conexão ao EMQX...');if(window.mqtt&&typeof window.mqtt.connect==='function')connect();else setTimeout(()=>{if(window.mqtt)connect();else message('Biblioteca MQTT indisponível. Verifique a internet.');},1500);}return;}
+ // Suporte ao firmware antigo: o endpoint /pair só pode ser acessado na mesma rede do ESP32.
+ stop();location.href=u.href;
+ }catch(e){msg.textContent='Link inválido: '+e.message;}}
+function loadJsQr(){return new Promise((resolve,reject)=>{
+ if(window.jsQR){jsqr=window.jsQR;resolve();return;}
+ const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+ script.onload=()=>{jsqr=window.jsQR;if(jsqr)resolve();else reject(new Error('Leitor não carregou'));};
+ script.onerror=()=>reject(new Error('Não foi possível carregar o leitor QR. Verifique a internet.'));
+ document.head.appendChild(script);
+ });}
+async function scan(){if(!active||scanning)return;scanning=true;
+ try{
+ let decoded=null;
+ if(detector){try{const codes=await detector.detect(video);if(codes.length)decoded=codes[0].rawValue;}catch(e){detector=null;}}
+ if(!decoded&&jsqr&&video.readyState>=2){const w=video.videoWidth,h=video.videoHeight;
+ if(w&&h){canvas.width=w;canvas.height=h;ctx.drawImage(video,0,0,w,h);
+ const pixels=ctx.getImageData(0,0,w,h);const found=jsqr(pixels.data,w,h,{inversionAttempts:'attemptBoth'});
+ if(found)decoded=found.data;}}
+ if(decoded){scanning=false;openPair(decoded);return;}
+ }catch(e){msg.textContent='Falha ao processar imagem: '+e.message;}
+ scanning=false;if(active)setTimeout(scan,180);
+}
+document.getElementById('scanQrBtn')?.addEventListener('click',async()=>{
+ overlay.hidden=false;msg.textContent='Preparando câmera e leitor QR...';
+ try{
+ if('BarcodeDetector' in window){try{detector=new BarcodeDetector({formats:['qr_code']});}catch(e){detector=null;}}
+ // jsQR serve de alternativa quando BarcodeDetector não existe ou não reconhece o código.
+ try{await loadJsQr();}catch(e){if(!detector)throw e;}
+ if(!navigator.mediaDevices?.getUserMedia)throw Error('Navegador sem acesso à câmera. Abra o painel em HTTPS.');
+ stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
+ video.srcObject=stream;await video.play();active=true;
+ msg.textContent='Aponte a câmera para o QR Code do receptor. Mantenha a imagem nítida e bem iluminada.';
+ scan();
+ }catch(e){msg.textContent='Não foi possível iniciar a leitura: '+e.message;}
+});
 document.getElementById('qrScanClose').onclick=stop;overlay.addEventListener('click',e=>{if(e.target===overlay)stop()});
 })();
 </script><div id="shareQrOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="shareQrTitle" style="position:fixed;inset:0;z-index:12000;background:#06121def;display:flex;align-items:center;justify-content:center;padding:14px">
