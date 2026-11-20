@@ -112,6 +112,77 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 .emqx-connected{border-color:#327f68}.emqx-connected .metric-value{color:#62e3af}.emqx-connected .emqx-indicator{background:#49dda0;box-shadow:0 0 0 3px #49dda022}
 .emqx-disconnected{border-color:#9c4c58}.emqx-disconnected .metric-value{color:#ff8792}
 @media(max-width:600px){.topright .date-metric{grid-column:1/-1}.topright .source-compact{grid-column:1/-1}.emqx-metric .metric-value{font-size:12px}}
+
+
+/* MELHORIA VISUAL 2026-11-20 — somente apresentação; funções preservadas */
+@media(min-width:1000px){
+  .wrap{max-width:1370px}
+  .flowcard{padding:24px 28px 18px}
+  .flow-first{margin-top:22px;margin-bottom:22px}
+}
+#technical .hero{padding:34px 0 24px}
+#technical .hero h1{margin-block:8px 12px}
+#technical .grid{gap:19px}
+#technical .section{margin-block:24px}
+#technical .card{
+  padding:27px;
+  border-radius:20px;
+  background:linear-gradient(150deg,#142d42 0%,#0d2032 100%);
+  box-shadow:0 12px 32px #00000024;
+}
+#technical .card h2{font-size:21px;line-height:1.3;margin-bottom:15px}
+#technical .card h3{font-size:18px}
+#technical .techgrid{gap:17px}
+#technical .techgrid .card{
+  min-height:164px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  border-top:2px solid #35617a;
+}
+#technical .techgrid .kicker{font-size:12px;line-height:1.45}
+#technical .techgrid .techval{font-size:clamp(23px,2.4vw,32px);line-height:1.2;margin:14px 0 10px}
+#technical #tFaultCause.techval{font-size:clamp(16px,1.45vw,20px)!important;line-height:1.35}
+#technical .techgrid .tiny{font-size:12px;line-height:1.5}
+#technical .columns{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+#technical .events{max-height:390px}
+#technical .event{padding-block:14px}
+#technical canvas{height:250px}
+#technical .buttons{gap:12px}
+#technical .buttons .btn{min-height:46px;padding:12px 17px}
+#technical .description,#technical .help{line-height:1.7}
+#technical #qrPairCard{padding:24px!important}
+#residents .step .emoji{font-size:35px}
+#residents .step{padding-block:21px}
+#residents .flowcard .flow-tag{font-size:13px}
+#residents .flow-bottom{font-size:15px}
+/* Amplia discretamente a ilustração incorporada da motobomba,
+   sem alterar o desenho SVG, seus indicadores ou animações. */
+#flowCard .watermap image{transform:scale(1.12);transform-box:fill-box;transform-origin:center}
+@media(max-width:900px){
+  #technical .columns{grid-template-columns:1fr}
+  #technical .card{padding:22px}
+  #technical .techgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #technical .techgrid .card{min-height:150px}
+}
+@media(max-width:600px){
+  #technical .hero{padding:23px 0 16px}
+  #technical .grid{gap:12px}
+  #technical .section{margin-block:15px}
+  #technical .card{padding:18px;border-radius:17px}
+  #technical .card h2{font-size:19px}
+  #technical .techgrid{gap:10px}
+  #technical .techgrid .card{min-height:142px;padding:15px}
+  #technical .techgrid .techval{font-size:22px;margin:11px 0 8px}
+  #technical #tFaultCause.techval{font-size:16px!important}
+  #technical .techgrid .tiny{font-size:11px}
+  #technical canvas{height:215px}
+  #technical .buttons .btn{flex:1 1 140px}
+  #technical #qrPairCard{padding:17px!important}
+  #residents .step .emoji{font-size:32px}
+  #flowCard .watermap image{transform:scale(1.07)}
+  #residents .flow-bottom{font-size:12px}
+}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
