@@ -319,7 +319,25 @@ $('techAuthCancel').onclick=closeTechAuth;
 techAuthOverlay.addEventListener('click',event=>{if(event.target===techAuthOverlay)closeTechAuth()});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!techAuthOverlay.hidden)closeTechAuth()});
 $('tabResidents').onclick=()=>{techUnlocked=false;showTech(false)};
-$('tabTechnical').onclick=openTechAuth;$('togglePump').onclick=()=>simChange({contator:!state.contator},'Bomba alternada');$('togglePressure').onclick=()=>simChange({pressostato:!state.pressostato},'Pressostato alternado');$('toggleLora').onclick=()=>simChange({lora:!state.lora},'Comunicação LoRa alternada');$('simulateIncoherent').onclick=()=>{if(state.mode!=='simulation')return;state.protecaoOk=true;state.pressostato=false;state.contator=true;state.causaFalha='NENHUMA';log('Teste: pressostato SEM ÁGUA + contator LIGADO => VERIFICAR PROTEÇÃO (não é FALHA BOMBA)','TESTE');history();render()};$('simulatePumpFault').onclick=()=>{if(state.mode!=='simulation')return;state.protecaoOk=!state.protecaoOk;state.causaFalha=state.protecaoOk?'NENHUMA':'DISJUNTOR_OU_TERMICO';if(!state.protecaoOk)state.contator=false;log('Proteção elétrica '+(state.protecaoOk?'normalizada':'aberta: FALHA BOMBA')+'; pressostato '+(state.pressostato?'COM ÁGUA':'SEM ÁGUA')+' (inalterado)','TESTE');history();render()};$('resetSim').onclick=simulation;$('simulateBtn').onclick=simulation;$('connectBtn').onclick=connect;$('disconnectBtn').onclick=()=>{try{localStorage.removeItem(MQTT_PREF_KEY)}catch(e){}$('rememberMqtt').checked=false;if(state.client){state.client.end(true);state.client=null}state.mqtt=false;state.deviceOnline=false;state.lastPacket=0;message('Desconectado manualmente.');render()};$('clearEvents').onclick=()=>{state.events=[];$('events').innerHTML='<p class="help">Nenhum evento nesta sessão.</p>'};window.addEventListener('resize',chart);setInterval(()=>{$('clock').textContent=panelDate(panelNow())+' '+panelTime(panelNow());render()},1000);setInterval(()=>{if(state.mode==='simulation'&&state.lora)history()},15000);$('clock').textContent=panelDate(panelNow())+' '+panelTime(panelNow());render();syncInternetClock();setInterval(syncInternetClock,30*60*1000);if(restoreMqttSettings()){message('Restaurando conexão EMQX salva…');connect();}
+$('tabTechnical').onclick=openTechAuth;$('togglePump').onclick=()=>simChange({contator:!state.contator},'Bomba alternada');$('togglePressure').onclick=()=>simChange({pressostato:!state.pressostato},'Pressostato alternado');$('toggleLora').onclick=()=>simChange({lora:!state.lora},'Comunicação LoRa alternada');$('simulateIncoherent').onclick=()=>{if(state.mode!=='simulation')return;state.protecaoOk=true;state.pressostato=false;state.contator=true;state.causaFalha='NENHUMA';log('Teste: pressostato SEM ÁGUA + contator LIGADO => VERIFICAR PROTEÇÃO (não é FALHA BOMBA)','TESTE');history();render()};$('simulatePumpFault').onclick=()=>{if(state.mode!=='simulation')return;state.protecaoOk=!state.protecaoOk;state.causaFalha=state.protecaoOk?'NENHUMA':'DISJUNTOR_OU_TERMICO';if(!state.protecaoOk)state.contator=false;log('Proteção elétrica '+(state.protecaoOk?'normalizada':'aberta: FALHA BOMBA')+'; pressostato '+(state.pressostato?'COM ÁGUA':'SEM ÁGUA')+' (inalterado)','TESTE');history();render()};$('resetSim').onclick=simulation;$('simulateBtn').onclick=simulation;$('connectBtn').onclick=connect;$('disconnectBtn').onclick=()=>{try{localStorage.removeItem(MQTT_PREF_KEY)}catch(e){}$('rememberMqtt').checked=false;if(state.client){state.client.end(true);state.client=null}state.mqtt=false;state.deviceOnline=false;state.lastPacket=0;message('Desconectado manualmente.');render()};$('clearEvents').onclick=()=>{state.events=[];$('events').innerHTML='<p class="help">Nenhum evento nesta sessão.</p>'};window.addEventListener('resize',chart);setInterval(()=>{$('clock').textContent=panelDate(panelNow())+' '+panelTime(panelNow());render()},1000);setInterval(()=>{if(state.mode==='simulation'&&state.lora)history()},15000);$('clock').textContent=panelDate(panelNow())+' '+panelTime(panelNow());render();syncInternetClock();setInterval(syncInternetClock,30*60*1000);// A biblioteca MQTT foi carregada com defer: aguardar o evento load antes de tentar conectar.
+// Caso a CDN demore, repetir a verificação por alguns segundos sem apagar as credenciais.
+function startSavedMqttConnection(){
+  if(!restoreMqttSettings())return;
+  message('Dados MQTT recuperados. Preparando reconexão automática…');
+  let attempts=0;
+  function attempt(){
+    if(window.mqtt && typeof window.mqtt.connect==='function'){
+      message('Reconectando automaticamente ao EMQX…');
+      connect();
+      return;
+    }
+    if(++attempts<30){setTimeout(attempt,1000);}
+    else message('Não foi possível carregar a biblioteca MQTT. Verifique a internet e atualize a página. Os dados permanecem salvos.');
+  }
+  attempt();
+}
+if(document.readyState==='complete')startSavedMqttConnection();
+else window.addEventListener('load',startSavedMqttConnection,{once:true});
 </script>
 
 
