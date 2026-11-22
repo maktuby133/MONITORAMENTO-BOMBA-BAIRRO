@@ -185,13 +185,13 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 }
 
 /* Iluminação das casas e céu por horário local do celular (visual apenas). */
-#skyBackdrop,#skySun,#skyMoon,#skyStars,.house-window{transition:fill 1.5s ease,opacity 1.5s ease}
-#flowCard.day-scene #skyBackdrop{fill:#fff0b3;opacity:.48}
-#flowCard.day-scene #skySun{opacity:1}
+#skyBackdrop,#skySun,#sunRays,#sunGlow,#skyMoon,#skyStars,.house-window{transition:fill 1.5s ease,opacity 1.5s ease}
+#flowCard.day-scene #skyBackdrop{fill:#fffdf2;opacity:.96}
+#flowCard.day-scene #skySun,#flowCard.day-scene #sunRays,#flowCard.day-scene #sunGlow{opacity:1}
 #flowCard.day-scene #skyMoon,#flowCard.day-scene #skyStars{opacity:0}
 #flowCard.day-scene .house-window{fill:#83b6d0}
 #flowCard.night-scene #skyBackdrop{fill:#071126;opacity:.6}
-#flowCard.night-scene #skySun{opacity:0}
+#flowCard.night-scene #skySun,#flowCard.night-scene #sunRays,#flowCard.night-scene #sunGlow{opacity:0}
 #flowCard.night-scene #skyMoon,#flowCard.night-scene #skyStars{opacity:1}
 #flowCard.night-scene .house-window{fill:#ffe0a0}
 </style>
@@ -212,7 +212,9 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 <g class="sky" id="neighborhoodSky">
 <rect id="skyBackdrop" width="1080" height="305" fill="#0b2139" opacity=".48"/>
 <g id="skyStars" fill="#d5efff"><circle cx="745" cy="47" r="2"/><circle cx="821" cy="83" r="1.8"/><circle cx="1021" cy="31" r="2"/><circle cx="684" cy="97" r="1.5"/><circle cx="993" cy="117" r="1.4"/></g>
-<circle id="skySun" cx="932" cy="61" r="24" fill="#ffd18a" opacity="0"/>
+<circle id="sunGlow" cx="932" cy="61" r="48" fill="#ffe8a3" opacity="0"/>
+<g id="sunRays" stroke="#f3b83f" stroke-width="3.5" stroke-linecap="round" opacity="0"><path d="M932 16v-9 M932 106v9 M887 61h-9 M977 61h9 M900 29l-7-7 M964 93l7 7 M964 29l7-7 M900 93l-7 7"/></g>
+<circle id="skySun" cx="932" cy="61" r="24" fill="#ffd45e" stroke="#f5b943" stroke-width="2" opacity="0"/>
 <path id="skyMoon" d="M944 33a27 27 0 1 0 20 44a23 23 0 0 1-20-44Z" fill="#e6efff" opacity=".95"/>
 <path d="M0 305H1080" stroke="#416b72" stroke-width="2"/><path d="M0 307H1080V370H0Z" fill="#102b38"/>
 </g>
