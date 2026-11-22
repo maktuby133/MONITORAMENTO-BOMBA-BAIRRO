@@ -564,4 +564,104 @@ document.getElementById('qrScanClose').onclick=stop;overlay.addEventListener('cl
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden)close()});
 })();
 </script>
+
+<!-- Alertas locais do navegador: sem serviços externos de notificacao. -->
+<style>
+#localNotifyCard{margin:16px 0;border:1px solid #31516a;border-radius:15px;background:#102638;padding:16px}
+#localNotifyCard .notify-line{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#localNotifyCard h3{font-size:16px;margin:0 0 4px}
+#localNotifyCard p{font-size:12px;color:#b3c9d9;margin:0}
+#localNotifyStatus{font-size:12px;color:#a3b8c9;margin-top:9px}
+</style>
+<script>
+(function(){
+'use strict';
+const KEY='aguaBairro_notificacoes_v1';
+const card=document.createElement('div');
+card.id='localNotifyCard';
+card.innerHTML='<div class="notify-line"><div><h3>🔔 Alertas no celular</h3><p>Avisos de falha, falta de água e recuperação enquanto o painel estiver ativo.</p></div><button type="button" class="btn primary" id="localNotifyButton">Ativar notificações</button></div><div id="localNotifyStatus" role="status" aria-live="polite"></div>';
+const target=document.getElementById('publicAlerts');
+if(target)target.parentNode.insertBefore(card,target);
+else document.getElementById('residents')?.prepend(card);
+const button=document.getElementById('localNotifyButton');
+const status=document.getElementById('localNotifyStatus');
+const supported=('Notification' in window)&&window.isSecureContext;
+let enabled=false, initialized=false;
+const stable=new Map(), active=new Map();
+let firstTelemetry=false;
+function label(){
+ if(!supported){button.disabled=true;status.textContent='Este navegador não permite notificações locais nesta página. Abra o painel em HTTPS.';return;}
+ if(Notification.permission==='denied'){button.disabled=true;status.textContent='Notificações bloqueadas. Libere a permissão nas configurações do navegador.';return;}
+ button.textContent=enabled?'Desativar notificações':'Ativar notificações';
+ status.textContent=enabled?'Ativadas neste navegador. Mantenha o painel aberto para receber os avisos.':'Desativadas neste navegador.';
+}
+try{enabled=localStorage.getItem(KEY)==='1'&&supported&&Notification.permission==='granted'}catch(e){}
+button.addEventListener('click',async()=>{
+ if(enabled){enabled=false;try{localStorage.setItem(KEY,'0')}catch(e){};label();return;}
+ if(!supported)return;
+ let permission=Notification.permission;
+ if(permission==='default')permission=await Notification.requestPermission();
+ if(permission!=='granted'){label();return;}
+ enabled=true;try{localStorage.setItem(KEY,'1')}catch(e){}
+ // Inicializa a linha de base sem disparar alertas de condições anteriores.
+ initialized=false;stable.clear();active.clear();
+ label();
+ notify('Notificações ativadas','Você receberá avisos enquanto o painel estiver ativo.', 'teste');
+});
+async function notify(title,body,tag){
+ if(!enabled||!supported||Notification.permission!=='granted')return;
+ const options={body,tag:'agua-bairro-'+tag,icon:'./icon-192.png',badge:'./icon-192.png'};
+ try{
+   if('serviceWorker' in navigator){
+     const reg=await navigator.serviceWorker.getRegistration();
+     if(reg&&typeof reg.showNotification==='function'){await reg.showNotification('Água do Bairro — '+title,options);return;}
+   }
+   new Notification('Água do Bairro — '+title,options);
+ }catch(err){console.warn('Notificação não exibida:',err)}
+}
+const faults={
+ water:{title:'Falta de água',body:'Pressostato indica ausência de água na entrada da bomba.'},
+ thermal:{title:'Falha na proteção elétrica',body:'Proteção térmica ou elétrica da bomba indica falha.'},
+ unsafe:{title:'Atenção: contator ligado sem água',body:'O contator está ligado e o pressostato indica falta de água.'},
+ lora:{title:'Comunicação LoRa interrompida',body:'Não chegaram novos pacotes LoRa dentro do prazo.'},
+ emqx:{title:'Conexão EMQX interrompida',body:'O painel perdeu a conexão MQTT com o EMQX.'}
+};
+function poll(){
+ if(typeof state==='undefined'||state.mode!=='mqtt')return;
+ const now=Date.now();
+ // Nunca confundir simulação, inicialização ou falta de configuração com uma falha.
+ if(state.lastPacket>0)firstTelemetry=true;
+ if(!firstTelemetry)return;
+ const fresh=state.deviceOnline&&state.lastPacket>0&&now-state.lastPacket<45000;
+ const online=!!state.mqtt;
+ const raw={
+   water:fresh&&!state.pressostato,
+   thermal:fresh&&state.protecaoOk===false,
+   unsafe:fresh&&state.contator&&!state.pressostato,
+   lora:!fresh,
+   emqx:!online
+ };
+ // A falta de conexão não implica, por si só, falta de água ou falha elétrica.
+ const delays={water:8000,thermal:8000,unsafe:5000,lora:5000,emqx:15000};
+ for(const [key,flag] of Object.entries(raw)){
+   const previous=stable.get(key);
+   if(!previous||previous.value!==flag)stable.set(key,{value:flag,since:now});
+   const record=stable.get(key);
+   if(now-record.since<delays[key])continue;
+   const prior=active.get(key);
+   if(prior===undefined){active.set(key,flag);continue;}
+   if(prior===flag)continue;
+   active.set(key,flag);
+   if(!initialized||!enabled)continue;
+   if(flag)notify(faults[key].title,faults[key].body,key);
+   else notify('Situação normalizada',faults[key].title+' — condição normalizada.',key+'-ok');
+ }
+ // Primeira avaliação estabilizada é somente referência, sem alertas retrospectivos.
+ if(!initialized&&Object.keys(raw).every(k=>active.has(k)))initialized=true;
+}
+label();
+setInterval(poll,2000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+})();
+</script>
 </body></html>
