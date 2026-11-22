@@ -183,6 +183,17 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
   #flowCard .watermap image{transform:scale(1.07)}
   #residents .flow-bottom{font-size:12px}
 }
+
+/* Iluminação das casas e céu por horário local do celular (visual apenas). */
+#skyBackdrop,#skySun,#skyMoon,#skyStars,.house-window{transition:fill 1.5s ease,opacity 1.5s ease}
+#flowCard.day-scene #skyBackdrop{fill:#72c9f0;opacity:.22}
+#flowCard.day-scene #skySun{opacity:1}
+#flowCard.day-scene #skyMoon,#flowCard.day-scene #skyStars{opacity:0}
+#flowCard.day-scene .house-window{fill:#83b6d0}
+#flowCard.night-scene #skyBackdrop{fill:#071126;opacity:.6}
+#flowCard.night-scene #skySun{opacity:0}
+#flowCard.night-scene #skyMoon,#flowCard.night-scene #skyStars{opacity:1}
+#flowCard.night-scene .house-window{fill:#ffe0a0}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
@@ -198,7 +209,13 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 <section id="residents"><section class="section flow-first"><div class="card flowcard" id="flowCard"><div class="flow-top"><span class="flow-tag" id="flowTag">● BOMBA DESLIGADA</span></div>
 <div class="flow-scroll" aria-label="Diagrama hidráulico completo adaptado à largura da tela"><svg class="watermap" viewBox="0 0 1080 370" role="img" aria-label="Ilustração animada da rede pública alimentando a bomba do bairro e as residências">
 <defs><linearGradient id="water" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#72e6ff"/><stop offset="1" stop-color="#168dce"/></linearGradient><linearGradient id="building" x1="0" x2="1"><stop stop-color="#245071"/><stop offset="1" stop-color="#122d46"/></linearGradient><linearGradient id="pumpSteel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3194cf"/><stop offset=".52" stop-color="#12558e"/><stop offset="1" stop-color="#082e55"/></linearGradient><linearGradient id="motorBlue" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3d9ed8"/><stop offset=".5" stop-color="#1769a8"/><stop offset="1" stop-color="#0a3767"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g class="sky"><circle cx="932" cy="61" r="24" fill="#ffd18a" opacity=".8"/><path d="M0 305H1080" stroke="#416b72" stroke-width="2"/><path d="M0 307H1080V370H0Z" fill="#102b38"/></g>
+<g class="sky" id="neighborhoodSky">
+<rect id="skyBackdrop" width="1080" height="305" fill="#0b2139" opacity=".48"/>
+<g id="skyStars" fill="#d5efff"><circle cx="745" cy="47" r="2"/><circle cx="821" cy="83" r="1.8"/><circle cx="1021" cy="31" r="2"/><circle cx="684" cy="97" r="1.5"/><circle cx="993" cy="117" r="1.4"/></g>
+<circle id="skySun" cx="932" cy="61" r="24" fill="#ffd18a" opacity="0"/>
+<path id="skyMoon" d="M944 33a27 27 0 1 0 20 44a23 23 0 0 1-20-44Z" fill="#e6efff" opacity=".95"/>
+<path d="M0 305H1080" stroke="#416b72" stroke-width="2"/><path d="M0 307H1080V370H0Z" fill="#102b38"/>
+</g>
 <!-- Entrada direta da rede pública, sem representação de estação -->
 <g aria-label="Entrada de água da rede pública"><path d="M44 251H105" stroke="#40657b" stroke-width="28" stroke-linecap="round"/><rect x="51" y="231" width="13" height="40" rx="3" fill="#9ab6c6" stroke="#d6e8f1" stroke-width="2"/><text x="133" y="336" text-anchor="middle" class="svg-label">ÁGUA DA REDE</text></g>
 <!-- piping behind pump and homes -->
@@ -222,7 +239,7 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 </g>
 </g>
 <!-- homes -->
-<g><g transform="translate(752 145)"><path d="M0 45L53 0L106 45V131H0Z" fill="#28536c" stroke="#73b6d3" stroke-width="3"/><path d="M-10 46L53 -8L116 46" fill="none" stroke="#79c5dc" stroke-width="9" stroke-linejoin="round"/><rect x="39" y="74" width="30" height="57" rx="3" fill="#0c263b"/><rect x="11" y="58" width="22" height="25" rx="3" fill="#ffe0a0"/><rect x="76" y="58" width="22" height="25" rx="3" fill="#ffe0a0"/></g><g transform="translate(891 159)"><path d="M0 45L48 0L96 45V117H0Z" fill="#24506b" stroke="#73b6d3" stroke-width="3"/><path d="M-9 46L48 -7L105 46" fill="none" stroke="#79c5dc" stroke-width="9" stroke-linejoin="round"/><rect x="36" y="67" width="27" height="50" rx="3" fill="#0c263b"/><rect x="9" y="57" width="21" height="22" rx="3" fill="#ffe0a0"/><rect x="71" y="57" width="18" height="22" rx="3" fill="#ffe0a0"/></g><text x="873" y="336" text-anchor="middle" class="svg-label">CASAS DO BAIRRO</text></g>
+<g><g transform="translate(752 145)"><path d="M0 45L53 0L106 45V131H0Z" fill="#28536c" stroke="#73b6d3" stroke-width="3"/><path d="M-10 46L53 -8L116 46" fill="none" stroke="#79c5dc" stroke-width="9" stroke-linejoin="round"/><rect x="39" y="74" width="30" height="57" rx="3" fill="#0c263b"/><rect x="11" y="58" width="22" height="25" rx="3" class="house-window" fill="#ffe0a0"/><rect x="76" y="58" width="22" height="25" rx="3" class="house-window" fill="#ffe0a0"/></g><g transform="translate(891 159)"><path d="M0 45L48 0L96 45V117H0Z" fill="#24506b" stroke="#73b6d3" stroke-width="3"/><path d="M-9 46L48 -7L105 46" fill="none" stroke="#79c5dc" stroke-width="9" stroke-linejoin="round"/><rect x="36" y="67" width="27" height="50" rx="3" fill="#0c263b"/><rect x="9" y="57" width="21" height="22" rx="3" class="house-window" fill="#ffe0a0"/><rect x="71" y="57" width="18" height="22" rx="3" class="house-window" fill="#ffe0a0"/></g><text x="873" y="336" text-anchor="middle" class="svg-label">CASAS DO BAIRRO</text></g>
 </svg></div><div class="status-light-legend" aria-label="Legenda das luzes"><span><i style="background:#36e7a5"></i>Normal</span><span><i style="background:#ffb84d"></i>Sem água</span><span><i style="background:#ff4b55"></i>Falha</span><span><i style="background:#8194a3"></i>Sem dados / desligada</span></div><div class="flow-bottom"><span><i class="flow-dot" id="flowDot"></i><strong id="flowMessage">Bomba desligada</strong></span><span id="stepPressure">Pressão disponível</span></div><p class="flow-disclaimer">Animação baseada nos sinais monitorados, não em um medidor de vazão. Bomba ligada e pressão disponível não garantem chegada de água às residências.</p></div></section>
 
 
@@ -662,6 +679,25 @@ function poll(){
 label();
 setInterval(poll,2000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+})();
+</script>
+
+<script>
+/* Altera somente o aspecto visual das casas, sem interferir na telemetria. */
+(function(){
+ const scene=document.getElementById('flowCard');
+ if(!scene)return;
+ function updateNeighborhoodLighting(){
+   const hour=new Date().getHours();
+   const day=hour>=6&&hour<18;
+   scene.classList.toggle('day-scene',day);
+   scene.classList.toggle('night-scene',!day);
+   const sky=document.getElementById('neighborhoodSky');
+   if(sky)sky.setAttribute('aria-label',day?'Paisagem diurna':'Paisagem noturna');
+ }
+ updateNeighborhoodLighting();
+ setInterval(updateNeighborhoodLighting,60000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateNeighborhoodLighting()});
 })();
 </script>
 </body></html>
