@@ -376,7 +376,12 @@ function telemetry(d){
  state.telemetryLostAt=0;
  const prevC=state.contator,prevP=state.pressostato,prevT=state.protecaoOk;
  state.deviceOnline=true;state.contator=asBool(c);state.pressostato=asBool(p);
- state.protecaoOk=allowed.includes(d.protecao_ok)?asBool(d.protecao_ok):null;
+ // Compatibilidade com a telemetria do receptor: falha eletrica independente do pressostato.
+ const protectionSignals=[d.protecao_ok,d.termico_ok,d.energia_ok].filter(v=>allowed.includes(v));
+ const pumpFault=allowed.includes(d.falha_bomba)&&asBool(d.falha_bomba);
+ const pumpStatus=typeof d.status_bomba==='string'?d.status_bomba.trim().toUpperCase():'';
+ state.protecaoOk=pumpFault||pumpStatus==='FALHA_BOMBA'||protectionSignals.some(v=>!asBool(v))?false:
+   protectionSignals.length?true:allowed.includes(d.falha_bomba)?!asBool(d.falha_bomba):null;
  state.causaFalha=typeof d.causa_falha==='string'?d.causa_falha:'NENHUMA';
  const r=Number(d.rssi??d.lora_rssi);state.rssi=Number.isFinite(r)&&r>=-150&&r<=0?r:null;
  if(prevC!==state.contator)log('Contator '+(state.contator?'ligado':'desligado'),'ESTADO');
