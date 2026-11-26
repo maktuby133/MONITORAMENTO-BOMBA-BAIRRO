@@ -194,6 +194,30 @@ html,body{max-width:100%;overflow-x:clip} .wrap,.grid,.card,.flowcard,.header-me
 #flowCard.night-scene #skySun,#flowCard.night-scene #sunRays,#flowCard.night-scene #sunGlow{opacity:0}
 #flowCard.night-scene #skyMoon,#flowCard.night-scene #skyStars{opacity:1}
 #flowCard.night-scene .house-window{fill:#ffe0a0}
+
+/* Legibilidade dos avisos — somente apresentação */
+#flowCard .svg-title{font-size:22px;font-weight:900;letter-spacing:.4px}
+#flowCard .svg-small{font-size:19px;font-weight:900;letter-spacing:.3px}
+#flowCard .svg-label{font-size:20px;font-weight:850;fill:#f1f8ff}
+#flowCard #svgPressureStatus{font-size:22px;font-weight:900;paint-order:stroke fill;stroke:#102334;stroke-width:2px;stroke-linejoin:round}
+#flowCard.day-scene .svg-title,#flowCard.day-scene .svg-small{fill:#102b40}
+#flowCard.day-scene #svgPressureStatus{stroke:#fffdf2;fill:#263746}
+#flowCard.day-scene #svgPressureStatus[fill="#59e4b2"]{fill:#07583d}
+#flowCard.day-scene #svgPressureStatus[fill="#ff8792"]{fill:#a30e25}
+#flowCard.night-scene .svg-title,#flowCard.night-scene .svg-small{fill:#f0f8ff}
+#flowCard #pumpAlarmText{font-size:24px;font-weight:900;letter-spacing:0;fill:#fff}
+#flowCard #pumpAlarmText[font-size="14"]{font-size:19px}
+#pumpAlarmBox{animation:none}
+#residents #flowTag{font-size:clamp(15px,2vw,20px);font-weight:900;line-height:1.35;color:#f2f8ff;white-space:normal}
+#flowCard.pumpfault #flowTag{color:#fff;background:#8b2034;border-color:#ff8792}
+#residents .flow-bottom{font-size:clamp(14px,1.8vw,19px);font-weight:750;color:#edf7ff}
+#publicAlerts .alert strong{font-size:clamp(16px,2vw,20px);font-weight:850;line-height:1.35}
+#publicAlerts .alert small{font-size:14px;color:#e0eaf2;line-height:1.5}
+#publicAlerts .alert.danger strong{color:#ff9ca5}
+#publicAlerts .alert.warning strong{color:#ffda8f}
+#publicAlerts .alert.ok strong{color:#a0f4d4}
+#residents .overview .big{font-size:clamp(23px,3vw,36px)}
+@media(max-width:600px){#residents #flowTag{font-size:16px}#residents .flow-bottom{font-size:15px}#publicAlerts .alert small{font-size:13px}}
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
